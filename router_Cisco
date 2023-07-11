@@ -1,17 +1,17 @@
 Building configuration...
 
-Current configuration : 6877 bytes
+Current configuration : 4233 bytes
 !
-! Last configuration change at 21:12:32 PDT Mon Jul 10 2023 by jasencio
+! Last configuration change at 05:01:27 UTC Tue Jul 11 2023
 !
 version 16.9
-service timestamps debug datetime msec localtime
-service timestamps log datetime msec localtime
+service timestamps debug datetime msec
+service timestamps log datetime msec
 platform qfp utilization monitor load 80
 no platform punt-keepalive disable-kernel-core
 platform console virtual
 !
-hostname CiscoRouter
+hostname csr1000v-1
 !
 boot-start-marker
 boot-end-marker
@@ -21,8 +21,6 @@ no logging console
 enable secret 5 $1$dAnr$MQbNXMNy//wugqUbtZ2vk/
 !
 no aaa new-model
-clock timezone PST -8 0
-clock summer-time PDT recurring
 !
 !
 !
@@ -30,13 +28,7 @@ clock summer-time PDT recurring
 !
 !
 !
-ip name-server 8.8.8.8
 ip domain name cisco.com
-!
-ip dhcp pool data
- network 6.4.4.0 255.255.255.0
- dns-server 8.8.8.8 
- default-router 4.4.4.4 
 !
 !
 !
@@ -110,8 +102,6 @@ license boot level ax
 no license smart enable
 diagnostic bootup level minimal
 !
-spanning-tree mode rapid-pvst
-spanning-tree portfast bpduguard default
 spanning-tree extend system-id
 !
 netconf-yang
@@ -120,7 +110,6 @@ restconf
 !
 username developer privilege 15 secret 5 $1$Anez$e3JokiVvI4unDNdZ20HEG1
 username root privilege 15 secret 5 $1$mB0Z$srZ2lQWnzAC5JjFaTzJBn1
-username jasencio privilege 15 password 0 clave_personal
 !
 redundancy
 !
@@ -146,101 +135,44 @@ redundancy
 ! 
 !
 !
-interface Loopback0
- description first loop
- ip address 1.1.1.1 255.255.255.0
-!
-interface Loopback1
- description example loopback
- ip address 8.8.8.8 255.255.255.0
-!
-interface Loopback3
- ip address 2.2.2.2 255.255.255.0
-!
-interface Loopback209
- description STEP1
- ip address 200.200.200.200 255.255.255.255
-!
-interface Loopback301
- no ip address
-!
-interface VirtualPortGroup0
- ip address 192.168.1.1 255.255.255.0
- ip nat inside
- no mop enabled
- no mop sysid
+interface Loopback111
+ ip address 111.111.111.111 255.255.255.255
 !
 interface GigabitEthernet1
- description IPv6 ADDRESS
+ description MANAGEMENT INTERFACE - DON'T TOUCH ME
  ip address 10.10.20.48 255.255.255.0
- ip nat outside
  negotiation auto
- ipv6 address FE80::1:1 link-local
- ipv6 address 2001:DB8:ACAD:1::1/64
  no mop enabled
  no mop sysid
 !
 interface GigabitEthernet2
- description test1
- ip address 6.4.4.4 255.255.255.0
+ description Network Interface
+ no ip address
+ shutdown
  negotiation auto
  no mop enabled
  no mop sysid
 !
 interface GigabitEthernet3
- description Gigabit interface the third
- ip address 7.4.4.4 255.255.255.0
+ description Network Interface
+ no ip address
+ shutdown
  negotiation auto
  no mop enabled
  no mop sysid
 !
-iox
-ip default-gateway 192.168.122.1
-ip nat inside source list NAT-ACL interface GigabitEthernet1 overload
 ip forward-protocol nd
-no ip http server
+ip http server
 ip http authentication local
 ip http secure-server
 ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 10.10.20.254
 !
-ip extcommunity-list standard HUAWEI_U2020 permit rt 65000:1200505
-ip extcommunity-list standard HUAWEI_U2020 permit rt 65000:1200805
-ip extcommunity-list standard HUAWEI_U2020 permit rt 65000:1200905
-ip extcommunity-list standard HUAWEI_U2020 permit rt 65000:1200405
-ip extcommunity-list standard NO_HUAWEI permit rt 65000:92
 ip ssh rsa keypair-name ssh-key
 ip ssh version 2
 ip scp server enable
 !
 !
-ip prefix-list ATT_OAM_HUAWEI_PREFIXES seq 5 permit 10.209.46.173/32
 !
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 5 permit 10.150.206.0/26
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 10 permit 10.150.206.64/26
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 15 permit 10.150.208.128/26
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 20 permit 10.150.208.192/26
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 25 permit 10.150.212.128/26
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 30 permit 10.150.171.192/27
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 35 permit 10.150.46.192/27
-ip prefix-list ATT_OAM_U2020_PREFIXES seq 40 permit 10.150.123.160/27
-!
-ip access-list extended NAT-ACL
- permit ip 192.168.1.0 0.0.0.255 any
-!
-!
-route-map ATT_OAM_HUAWEI permit 10 
- match ip address prefix-list ATT_OAM_HUAWEI_PREFIXES
- set extcommunity rt 65000:120090 additive
-!
-route-map U2020_ATT_OAM_HUAWEI permit 10 
- match ip address prefix-list ATT_OAM_U2020_PREFIXES
- match extcommunity HUAWEI_U2020
-!
-route-map U2020_ATT_OAM_HUAWEI permit 20 
- match extcommunity NO_HUAWEI
-!
-snmp-server community python1 RO
-snmp-server community python2 RW
 !
 !
 control-plane
@@ -249,8 +181,7 @@ control-plane
 !
 !
 !
-banner motd ^CC
-******************************************************
+banner motd ^C
 Welcome to the DevNet Sandbox for CSR1000v and IOS XE
 
 The following programmability features are already enabled:
@@ -258,7 +189,6 @@ The following programmability features are already enabled:
   - RESTCONF
 
 Thanks for stopping by.
-******************************************************
 ^C
 !
 line con 0
@@ -268,15 +198,9 @@ line vty 0 4
  login local
  transport input ssh
 !
-ntp server 87.81.181.2
 !
 !
 !
 !
 !
-!
-app-hosting appid guestshell
- app-vnic gateway0 virtualportgroup 0 guest-interface 0
-  guest-ipaddress 192.168.1.2 netmask 255.255.255.0
- name-server0 8.8.8.8
 end
